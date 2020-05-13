@@ -3,7 +3,7 @@
 #include "src/player.h"
 #include "src/token.h"
 #include "src/point.h"
-#include "src/Game.h"
+#include "src/game.h"
 
 
 using namespace std;

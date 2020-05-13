@@ -4,14 +4,14 @@
 #include <SFML/Window.hpp>
 #include <SFML/Graphics/Text.hpp>
 #include <unistd.h>
-#include "Game.h"
-#include "Menu.h"
+#include "game.h"
+#include "menu.h"
 
 using namespace sf;
 
 const int WIDTH = 800;
 const int HEIGHT = 600;
-
+const std::string FONT_NAME = "font/Purisa, Regular.ttf";
 const size_t board_size = 8;
 
 void visualization(){
@@ -19,7 +19,7 @@ void visualization(){
     window.setFramerateLimit(60);
 
     Menu menu(WIDTH,HEIGHT,board_size);
-    Player **players = menu.display_menu(window);
+    Player **players = menu.display_menu(window, FONT_NAME);
 
     Game game(WIDTH,HEIGHT,players[0],players[1], board_size, menu.isEasyLevel());
 
@@ -41,7 +41,7 @@ void visualization(){
         }
         
         window.clear();
-        game.diaplay_board(window);
+        game.display_board(window);
         window.display();
         if(game.isItTheEndOfTheGame()) break;
 
@@ -49,20 +49,24 @@ void visualization(){
             Vector2i localPosition = Mouse::getPosition(window);
             Clock clock;
             Time time = clock.restart();
-            while(time.asMilliseconds()<600){
+            while(time.asMilliseconds()<600){ //wait 600 milliseconds for computer to move
                 time = clock.getElapsedTime();
             }
             game.playerMove(localPosition);
             window.clear();
-            game.diaplay_board(window);
+            game.display_board(window);
             window.display();
             if(game.isItTheEndOfTheGame()) break;
         }
     }
-    sleep(2);
+    Clock clock;
+    Time time = clock.restart();
+    while(time.asMilliseconds()<2200){ //wait 2200 milliseconds to end game
+        time = clock.getElapsedTime();
+    }
 
     sf::Font MyFont;
-    if (!MyFont.loadFromFile("font/Purisa, Regular.ttf"))
+    if (!MyFont.loadFromFile(FONT_NAME))
     {
         throw std::invalid_argument("Error: Cannot load font file");
     }
@@ -117,7 +121,6 @@ void visualization(){
                 window.close();
         }
         window.clear();
-        
         window.draw(sprite);
         window.draw(text);
         window.display();
