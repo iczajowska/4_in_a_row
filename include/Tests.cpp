@@ -1,8 +1,8 @@
 #include <iostream>
 #include <gtest/gtest.h>
-#include "src/Player.h"
-#include "src/Token.h"
-#include "src/Point.h"
+#include "src/player.h"
+#include "src/token.h"
+#include "src/point.h"
 #include "src/Game.h"
 
 
@@ -32,7 +32,7 @@ TEST(PlayerTest, construction){
     ASSERT_EQ(player_2.get_name(), "Henryk");
 }
 
-TEST(PlayerTest, AddTokens){
+TEST(PlayerTest, Add_Remove_Tokens){
     const Token t_0_0 = Token(1,0,0);
     const Token t_1_1 = Token(1,1,1);
     const Token t_0_1 = Token(1,0,1);
@@ -49,7 +49,12 @@ TEST(PlayerTest, AddTokens){
     EXPECT_FALSE(p_1.is_token_in_set(t_1_0));
     EXPECT_FALSE(p_1.is_token_in_set(t_0_1));
     EXPECT_FALSE(p_1.is_token_at_position(1,1));
-    
+    p_1.add_token(t_1_1);
+    EXPECT_TRUE(p_1.is_token_in_set(t_1_1));
+    EXPECT_TRUE(p_1.is_token_at_position(1,1));
+    p_1.remove_token(1,1);
+    EXPECT_FALSE(p_1.is_token_in_set(t_1_1));
+    EXPECT_FALSE(p_1.is_token_at_position(1,1));
 }
 
 TEST(PlayerTest,ChooseRandomColumn){
@@ -57,7 +62,10 @@ TEST(PlayerTest,ChooseRandomColumn){
     Player p_2(2,false);
     int columns[8] = {7,7,7,7,7,7,7,7};
     size_t num = p_1.choose_rand_column(columns);
-    EXPECT_TRUE(num>=0 && num<8);
+    for(int i=0; i<30; i++){
+        EXPECT_TRUE(num>=0 && num<8);
+        num = p_1.choose_rand_column(columns);
+    }
     EXPECT_THROW(p_2.choose_rand_column(columns), logic_error);
 }
 

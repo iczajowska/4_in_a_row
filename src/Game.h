@@ -3,9 +3,9 @@
 
 #include <iostream>
 #include <iterator>
-#include "Player.h"
-#include "Token.h"
-#include "Background.h"
+#include "player.h"
+#include "token.h"
+#include "background.h"
 #include <unistd.h>
 
 class Game{
@@ -20,7 +20,7 @@ class Game{
     Background background;
     bool easyLevel;
 
-    //display parameters
+    //display window parameters
     float window_width;
     float window_height;
 
@@ -46,6 +46,7 @@ class Game{
         }
         this->background = Background(width,height);
     }
+    size_t get_player_id_move( ){ return player_id_move; }
 
     int get_column(float x ){
         for(size_t i = 0; i < board_size; i++ ){
@@ -60,28 +61,28 @@ class Game{
     void playerMove(Vector2i mouse_position){
         int x = mouse_position.x;
         int y = mouse_position.y;
-        
-        float board_end_x = (column_seperate_size +2*radius)*float(board_size) + column_seperate_size +start_col_x;
-        float board_end_y = board_end_x - start_col_x + start_col_y;
-        if(float(x)< start_col_x || float(y)< start_col_y || float(x)> board_end_x || float(y)>board_end_y) return;
-        
-        int col = this->get_column(float(x));
-        
-        if(col == -1 || columns[col]<0) return;
 
-        size_t token_y = columns[col];
-        size_t token_x = col;
-        columns[col] --;
-        if(columns[col]<0) count_full_col++;
+        size_t token_y;
+        size_t token_x;
 
         if(player1->get_player_id() == player_id_move){ //first player is allways a person; second might be computer or other player
-        
+            float board_end_x = (column_seperate_size +2*radius)*float(board_size) + column_seperate_size +start_col_x;
+            float board_end_y = board_end_x - start_col_x + start_col_y;
+            if(float(x)< start_col_x || float(y)< start_col_y || float(x)> board_end_x || float(y)>board_end_y) return;
+            int col = this->get_column(float(x));
+            if(col == -1 || columns[col]<0) return;
+            token_y = columns[col];
+            token_x = col;
+            columns[col] --;
+            if(columns[col]<0) count_full_col++;
             player1->add_token(token_x,token_y);
             if(player1->check_if_win(token_x,token_y)){
                 this->winner = player1;
                 return;
             }
 
+            player_id_move = 1-player_id_move;
+/*
             if(!player2->is_computer()) player_id_move = 1-player_id_move;
             else{
                 if( count_full_col == board_size) {
@@ -102,14 +103,47 @@ class Game{
                     return;
                 }  
             }
-        }
+ */       }
         else{ // move of other person
-            player2->add_token(token_x,token_y);
-            player_id_move = 1-player_id_move;
-            if(player2->check_if_win(token_x,token_y)){
-                this->winner = player2;
-                return;
-            }  
+            if(player2->is_computer()){
+                player_id_move = 1-player_id_move;
+                if( count_full_col == board_size) {
+                    return; //every column is full
+                }
+                
+                if(!easyLevel) token_x = player2->choose_rand_column(columns, player1);
+                else token_x = player2->choose_rand_column(columns);
+                
+                token_y = columns[token_x];
+                columns[token_x]--;
+                
+                if(columns[token_x]<0) count_full_col++;
+                player2->add_token(token_x,token_y);
+
+                if(player2->check_if_win(token_x,token_y)){
+                    this->winner = player2;
+                    return;
+                }
+            }else{
+                float board_end_x = (column_seperate_size +2*radius)*float(board_size) + column_seperate_size +start_col_x;
+                float board_end_y = board_end_x - start_col_x + start_col_y;
+                if(float(x)< start_col_x || float(y)< start_col_y || float(x)> board_end_x || float(y)>board_end_y) return;
+                int col = this->get_column(float(x));
+                if(col == -1 || columns[col]<0) return;
+
+                token_y = columns[col];
+                token_x = col;
+                columns[col] --;
+                if(columns[col]<0) count_full_col++;
+
+                player2->add_token(token_x,token_y);
+                player_id_move = 1-player_id_move;
+                if(player2->check_if_win(token_x,token_y)){
+                    this->winner = player2;
+                    return;
+                }  
+            }
+
         }
     }
 

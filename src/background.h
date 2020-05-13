@@ -17,10 +17,7 @@ class Background{
 
     public:
     Background(){}
-    Background(float w, float h){
-        this->width = w;
-        this->height = h;
-    }
+    Background(float w, float h):width{w},height{h}{}
     
     void display(RenderWindow &window){
         if(!this->texture.loadFromFile("img/background.png")){

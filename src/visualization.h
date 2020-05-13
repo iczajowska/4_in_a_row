@@ -21,7 +21,8 @@ void visualization(){
     Menu menu(WIDTH,HEIGHT,board_size);
     Player **players = menu.display_menu(window);
 
-    Game game(WIDTH,HEIGHT,players[0],players[1], board_size, false);
+    Game game(WIDTH,HEIGHT,players[0],players[1], board_size, menu.isEasyLevel());
+
 
     while (window.isOpen())
     {
@@ -38,13 +39,27 @@ void visualization(){
 
             }
         }
-
+        
         window.clear();
         game.diaplay_board(window);
         window.display();
         if(game.isItTheEndOfTheGame()) break;
+
+        if(players[1]->is_computer() && game.get_player_id_move() != 1){
+            Vector2i localPosition = Mouse::getPosition(window);
+            Clock clock;
+            Time time = clock.restart();
+            while(time.asMilliseconds()<600){
+                time = clock.getElapsedTime();
+            }
+            game.playerMove(localPosition);
+            window.clear();
+            game.diaplay_board(window);
+            window.display();
+            if(game.isItTheEndOfTheGame()) break;
+        }
     }
-    sleep(1);
+    sleep(2);
 
     sf::Font MyFont;
     if (!MyFont.loadFromFile("font/Purisa, Regular.ttf"))

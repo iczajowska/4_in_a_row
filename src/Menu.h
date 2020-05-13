@@ -2,10 +2,10 @@
 #define MENU_H
 #include <iostream>
 #include <SFML/Graphics.hpp>
-#include "Player.h"
-#include "Button.h"
-#include "Checkbox.h"
-#include "TextBox.h"
+#include "player.h"
+#include "button.h"
+#include "checkbox.h"
+#include "textBox.h"
 
 class Menu{
     private:
@@ -15,6 +15,7 @@ class Menu{
     size_t board_size;
     Button startGameButton = Button( window_width/2.0f - 50.0f, 500.0f, 100.0f,50.0f,"img/button.png" ,"img/button_hover.png" );
     Checkbox checkbox = Checkbox(600.0f,100.0f,50.0f,50.0f,"img/unchecked.png", "img/check.png");
+    Checkbox checkbox_level_easy = Checkbox(500.0f,330.0f,50.0f,50.0f,"img/unchecked.png", "img/check.png");
     TextBox textBox1;
     TextBox textBox2;
     Texture texture;
@@ -43,6 +44,7 @@ class Menu{
         if(!textBox1.isHovered(mousePostion)&&textBox1.isTextBoxSelected()){
             textBox1.setIsSelected(false);
         }
+
         if(!checkbox.isBoxChecked()){
             if(textBox2.isHovered(mousePostion)&&!textBox2.isTextBoxSelected()){
                 textBox2.setIsSelected(true);
@@ -50,7 +52,12 @@ class Menu{
             if(!textBox2.isHovered(mousePostion)&&textBox2.isTextBoxSelected()){
                 textBox2.setIsSelected(false);
             }
+        } else{
+            if(checkbox_level_easy.isHovered(mousePostion))
+                checkbox_level_easy.changeChecked();
         }
+
+
         if(startGameButton.isHovered(mousePostion)){
             if(textBox1.getText() == "") return false;
             if(!checkbox.isBoxChecked()){
@@ -59,6 +66,10 @@ class Menu{
             } else return true;
         }
         return false; 
+    }
+
+    bool isEasyLevel(){
+        return checkbox_level_easy.isBoxChecked();
     }
 
     Player** display_menu(RenderWindow &window){
@@ -115,6 +126,9 @@ class Menu{
 
             if(!checkbox.isBoxChecked())
             textBox2.display(window);
+            else
+            checkbox_level_easy.display(window);
+            
             
             window.display();
             if(startGame) break;
